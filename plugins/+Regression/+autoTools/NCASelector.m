@@ -94,6 +94,7 @@ classdef NCASelector < Regression.autoTools.FeatureSelectorInterface
                     data.trainingSelection = logical(trainSelNewT);
                     data.testingSelection = logical(testSelNewT);
                 end
+            elseif strcmp(this.Testing, 'none')    
             else
                 error('Something wrong with Testing')
             end
@@ -157,17 +158,16 @@ classdef NCASelector < Regression.autoTools.FeatureSelectorInterface
             % step 3: regression
             if strcmp(this.classifier, 'PLSR')
                  class = Regression.plsr();
-                 [ this ] = Regression.autoTools.Helpers.numFeatMulti(data, this.rank(1:min([size(X,2),300])), cv, class, this);
+                 [ this ] = Regression.autoTools.Helpers.numFeatMulti(data, this.rank(1:min([size(X,2),500])), cv, class, this);
             elseif strcmp(this.classifier, 'SVR')
                  class = Regression.svr();
                  this.nComp = 1;
-                 [ this ] = Regression.autoTools.Helpers.numFeatMulti(data, this.rank(1:min([size(X,2), 300])), cv, class, this);
+                 [ this ] = Regression.autoTools.Helpers.numFeatMulti(data, this.rank(1:min([size(X,2), 500])), cv, class, this);
             else
                 error(['unsupported classifier: ', this.classifier]);
             end
             
-            subsInd = false(1,size(X,2));
-            subsInd(rank(1:this.nFeat)) = true;
+            subsInd = this.nFeat;
         end
     end  
 end

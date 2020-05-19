@@ -39,7 +39,7 @@ function info = automatedSelection()
         Parameter('shortCaption','Validation','value','kFold'),...
         Parameter('shortCaption','groupbasedVal','value',true),...
         Parameter('shortCaption','groupingVal','value','', 'enum',{''}),...
-        Parameter('shortCaption','Testing','value','holdout','enum',{'holdout','groups'}),...
+        Parameter('shortCaption','Testing','value','holdout','enum',{'holdout','groups','none'}),...
         Parameter('shortCaption','groupbasedTest','value',true),...
         Parameter('shortCaption','groupingTest','value','', 'enum',{''}),...
         Parameter('shortCaption','groupsTest','value',{''}, 'enum',{''}),...
@@ -143,15 +143,18 @@ function updateParameters(params,project)
         elseif params(i).shortCaption == string('Testing')
             params(i).onChangedCallback = @()updateParameters(params,project);
             holdout=strcmp(params(i).value, 'holdout');
+            none=strcmp(params(i).value, 'none');
         elseif params(i).shortCaption == string('groupbasedTest')
             params(i).onChangedCallback = @()updateParameters(params,project);
             groupbasedTest = params(i).value;
-       elseif params(i).shortCaption == string('groupingTest')
+            params(i).hidden = none;
+            params(i).updatePropGridField();
+        elseif params(i).shortCaption == string('groupingTest')
             params(i).enum = cellstr(grouping_captions);
             if isempty(params(i).value)
                 params(i).value = params(i).enum{1};
             end
-            params(i).hidden = ~groupbasedTest && holdout;
+            params(i).hidden = (~groupbasedTest && holdout) || none;
             params(i).updatePropGridField();
             grouping = removecats(groupings(:,strcmp(grouping_captions,params(i).getValue())));
             params(i).onChangedCallback = @()updateParameters(params,project);
@@ -161,10 +164,10 @@ function updateParameters(params,project)
                 params(i).value = params(i).enum;
                 params(i).updatePropGridField();
              end
-             params(i).hidden = holdout;
+             params(i).hidden = holdout || none;
              params(i).updatePropGridField();
         elseif params(i).shortCaption == string('percentTest')
-            params(i).hidden = ~holdout;
+            params(i).hidden = ~holdout || none;
             params(i).updatePropGridField();
         % evaluator
         elseif params(i).shortCaption == string('evaluator')
@@ -226,7 +229,7 @@ function [rank, numFeat, error, beta0, offset, projectedData]  = rankByMethod(da
      elseif method == string('NCA')
         disp(method);
         mySel= Regression.autoTools.NCASelector(params.evaluator);
-       mySel.nComp = params.nCompPLSR;
+        mySel.nComp = params.nCompPLSR;
         mySel.criterion = params.criterion;
         mySel.Validation = params.Validation;
         mySel.groupbasedVal = params.groupbasedVal;
@@ -268,7 +271,7 @@ function [rank, numFeat, error, beta0, offset, projectedData]  = rankByMethod(da
     else
         error('Invalid method specified, cannot compute feature ranks');
     end
-     numFeat = sum(subsInd);
+     numFeat = subsInd;
      error = mySel.err;
      beta0 = mySel.beta0 ;
      offset = mySel.offset;

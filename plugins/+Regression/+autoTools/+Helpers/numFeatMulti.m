@@ -112,6 +112,8 @@ helpVar = data.trainingSelection;
         this.beta0 = params.beta0;
         this.offset = params.offset;
     end
+    % manual input of nComp and nFeat
+    % idxnComp = 20; idx = 20;
     
     %% Weitere Berechnungen
     rank = this.rank;
