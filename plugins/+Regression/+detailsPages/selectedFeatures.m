@@ -79,13 +79,15 @@ function populateGui(elements,project,dataprocessingblock)
     yfill=[minfill,minfill,maxfill,maxfill]';
 
     try
-        dpbmean=newsensor.featureDefinitionSet.featureDefinitions.getByCaption('mean').dataProcessingBlock;
-        iPosmean=dpbmean.parameters.getByCaption('iPos').value;
+        str = featCap';
+        str1 = str(contains(str,'mean'));
+        str2 = split(str1,'mean_');
+        iPosmean = double(split(str2(:,2),'-'));
 
         indMean = find(contains(featCap,'mean')&contains(featCap,selSens));
 
         selMean=project.currentModel.fullModelData.featureSelection(indMean(1):indMean(end))';
-        selR1=iPosmean(selMean,:).*newsensor.cluster.samplingPeriod;
+        selR1=iPosmean(selMean,:);
 
         xfillm=[selR1(:,1),selR1(:,2),selR1(:,2),selR1(:,1)]';
 
@@ -94,13 +96,16 @@ function populateGui(elements,project,dataprocessingblock)
     end
 
     try
-        dpbpoly=newsensor.featureDefinitionSet.featureDefinitions.getByCaption('polyfit').dataProcessingBlock;
-        iPospoly=dpbpoly.parameters.getByCaption('iPos').value;
+        str = featCap';
+        str1 = str(contains(str,'polyfit'));
+        str2 = split(str1,'/');
+        str3 = split(str2(:,3),'_');
+        iPospoly = double(split(str3(:,2),'-'));
 
         indPoly = find(contains(featCap,'polyfit')&contains(featCap,selSens));
 
         selPoly=project.currentModel.fullModelData.featureSelection(indPoly(1):indPoly(end))';
-        selR2=iPospoly(selPoly,:).*newsensor.cluster.samplingPeriod; 
+        selR2=iPospoly(selPoly,:); 
 
         xfillp=[selR2(:,1),selR2(:,2),selR2(:,2),selR2(:,1)]';
 
@@ -111,7 +116,7 @@ function populateGui(elements,project,dataprocessingblock)
 
     try
         [~,row,~] = intersect(selR1(:,1),selR2(:,1));
-        selR3=iPosmean(selMean,:).*newsensor.cluster.samplingPeriod;
+        selR3=iPosmean(selMean,:);
         selR3=selR3(row,:);
 
         xfillmp=[selR3(:,1),selR3(:,2),selR3(:,2),selR3(:,1)]';
