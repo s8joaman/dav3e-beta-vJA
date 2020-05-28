@@ -45,20 +45,24 @@ helpVar = data.trainingSelection;
             params.trained = false;
             [params] = class.train(data,params,rank(1:i));
             for j = 1:nComp
-                params.nComp = j;
-                data.mode = 'training';
-                [~ , params] = class.apply(data,params,rank(1:i));
-                data.mode = 'validation';
-                [~ , params2] = class.apply(data,params,rank(1:i));
-                errTr=sqrt(mean((params.pred-trTar).^2));
-                errVa=sqrt(mean((params2.pred-teTar).^2));
-                err.training(j,i) = err.training(j,i) + errTr;
-                err.validation(j,i) = err.validation(j,i) + errVa;  % regression
-                foldErrTr(j,i,c) = errTr;
-                foldErrVa(j,i,c) = errVa;
+                params.nComp = j; 
+                if i >= j
+                    data.mode = 'training';
+                    [~ , params] = class.apply(data,params,rank(1:i));
+                    data.mode = 'validation';
+                    [~ , params2] = class.apply(data,params,rank(1:i));
+                    errTr=sqrt(mean((params.pred-trTar).^2));
+                    errVa=sqrt(mean((params2.pred-teTar).^2));
+                    err.training(j,i) = err.training(j,i) + errTr;
+                    err.validation(j,i) = err.validation(j,i) + errVa;  % regression
+                    foldErrTr(j,i,c) = errTr;
+                    foldErrVa(j,i,c) = errVa;
+                end
             end
         end      
     end
+    foldErrTr(foldErrTr==0) = NaN;
+    foldErrVa(foldErrVa==0) = NaN;
     
     for i=1:size(rank,1)
         for j=1:nComp
