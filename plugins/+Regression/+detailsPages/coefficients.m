@@ -44,7 +44,12 @@ function populateGui(elements,project,dataprocessingblock)
     if isempty(coeffs)
         return
     end
-    featCap = project.currentModel.fullModelData.featureCaptions;
+    try
+        featCap = project.currentModel.fullModelData.featureCaptions(dataprocessingblock.parameters.getByCaption('rank').value);
+    catch
+        featCap = project.currentModel.fullModelData.featureCaptions;
+    end
+    
     [~,idx] = sort(abs(coeffs),'descend');
     coeffs = coeffs(idx);
     featCap = cellstr(featCap(idx));

@@ -112,12 +112,12 @@ helpVar = data.trainingSelection;
     end
     this.nFeat = idx;
     this.err = err;
-    try
-        this.beta0 = params.beta0;
-        this.offset = params.offset;
-    end
+%     try
+%         this.beta0 = params.beta0;
+%         this.offset = params.offset;
+%     end
     % manual input of nComp and nFeat
-    % idxnComp = 19; this.nFeat = 20;
+    idxnComp = 19; this.nFeat = 20;
     
     %% Weitere Berechnungen
     % rank = this.rank;
@@ -136,6 +136,7 @@ helpVar = data.trainingSelection;
         tar = data.getSelectedData('testing');
         predTe = tar(:,rank(1:this.nFeat)) * ptest.beta0(:,idxnComp) + ptest.offset(idxnComp); % train plsr on testing data
 
+        this.beta0 = ptest.beta0;
         this.projectedData.testing = predTe;
         this.projectedData.errorTest = sqrt(mean((predTe-data.target(data.testingSelection)).^2)); % compute RMSE for testing
         this.projectedData.errorVal = err.validation(idxnComp,this.nFeat);
