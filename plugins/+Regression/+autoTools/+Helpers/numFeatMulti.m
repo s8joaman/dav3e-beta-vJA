@@ -26,6 +26,8 @@ params.nComp = nComp;
 params.trained = false;
 err.training = zeros(nComp,size(rank,1),'single');
 err.validation = zeros(nComp,size(rank,1),'single');
+% sstot = zeros(nComp,size(rank,1),'single');
+% ssres = zeros(nComp,size(rank,1),'single');
 helpVar = data.trainingSelection;
     for c = 1:cv.NumTestSets
     %     tic
@@ -57,6 +59,9 @@ helpVar = data.trainingSelection;
                     err.validation(j,i) = err.validation(j,i) + errVa;  % regression
                     foldErrTr(j,i,c) = errTr;
                     foldErrVa(j,i,c) = errVa;
+%                     n(j,i)=numel(teTar);
+%                     sstot(j,i)=sstot(j,i)+sum((params2.pred-mean(params2.pred)).^2);
+%                     ssres(j,i)=ssres(j,i)+sum((params2.pred-teTar).^2);
                 end
             end
         end      
@@ -72,6 +77,10 @@ helpVar = data.trainingSelection;
     end
     err.training = err.training ./ c;
     err.validation = err.validation ./ c;                 % regression 
+%     sstot = sstot./c;
+%     ssres = ssres./c;
+    err.training(err.training==0) = NaN;
+    err.validation(err.validation==0) = NaN;
     
     %% Wahl Kriterium
     if strcmp(this.criterion, 'Elbow')
