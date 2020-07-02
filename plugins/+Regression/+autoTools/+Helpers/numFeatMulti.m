@@ -112,6 +112,13 @@ helpVar = data.trainingSelection;
         [idxnComp,idx] = find(matrix==minMatrix);
         idx = min(idx);
         idxnComp = min(idxnComp);
+    elseif strcmp(this.criterion, 'MinOneStd+OptNComp')    
+        [m,ind] = min(err.validation(:,:));
+        [row,col] = find(err.validation==min(err.validation(:)));
+        minOneStd = err.validation(row,col)+err.stdValidation(row,col);
+        [~,col1] = find(m<minOneStd);
+        idx = col1(1);
+        idxnComp = ind(idx);
     elseif strcmp(this.criterion, 'All')
         idx = size(err.validation,2);
         idxnComp = this.nComp;
@@ -126,7 +133,7 @@ helpVar = data.trainingSelection;
 %         this.offset = params.offset;
 %     end
     % manual input of nComp and nFeat
-    idxnComp = 19; this.nFeat = 20;
+%     idxnComp = 19; this.nFeat = 20;
     
     %% Weitere Berechnungen
     % rank = this.rank;
