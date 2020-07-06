@@ -67,7 +67,7 @@ function info = automatedSelection()
     info.apply = @apply;
     info.train = @train;
     info.updateParameters = @updateParameters;
-    info.detailsPages = {'ranking','errorTrVaTe', 'error3D', 'selectedFeatures', 'coefficients', 'predictionOverTime', 'calibration'};
+    info.detailsPages = {'ranking','errorTrVaTe', 'error3D', 'selectedFeatures', 'coefficients', 'predictionOverTime', 'calibration','correlation'};
     info.requiresNumericTarget = true;
 end
 
