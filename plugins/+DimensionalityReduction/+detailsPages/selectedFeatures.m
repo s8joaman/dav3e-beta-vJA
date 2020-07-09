@@ -72,8 +72,10 @@ function populateGui(elements,project,dataprocessingblock)
     %     xlabel(elements.hAx,'time');
     %     ylabel(elements.hAx,'data a.u.');
     %     
-        minfill=min(redDat(:))-5e3;
-        maxfill=max(redDat(:))+5e3;
+        redDat2 = 1./redDat;
+        redDat3 = log10(redDat2);
+        minfill=min(redDat3(:))-abs(min(redDat3(:))*0.1);
+        maxfill=max(redDat3(:))+abs(max(redDat3(:))*0.1);
         
         f.EdgeColor=[0.5 0.5 0.5];
         featCap=project.currentModel.fullModelData.featureCaptions;
@@ -126,7 +128,7 @@ function populateGui(elements,project,dataprocessingblock)
         end
         %f.EdgeColor=[.5 .5 .5];
 
-        plot(elements.hAx,x,redDat(1,:),'color','b');
+        plot(elements.hAx,x,redDat3(1,:),'color','b');
         xlabel(elements.hAx,'time');
         ylabel(elements.hAx,'data a.u.');
         ylim(elements.hAx,[minfill maxfill]);
