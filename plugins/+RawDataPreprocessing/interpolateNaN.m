@@ -33,8 +33,8 @@ function [data,params] = apply(data,params)
     max_values = params.maxNaNValuesInCycle;
     cycle_with_nan = find(sum(isnan(data'))>0);
     for i=1:length(cycle_with_nan)
-        if sum(isnan(data(i,:))) > max_values
-           warning(['nan cycle: ', i])
+        if sum(isnan(data(cycle_with_nan(i),:))) > max_values
+           warning('nan cycle: '+ string(cycle_with_nan(i)));
         end
         data(cycle_with_nan(i),:) = fillmissing(data(cycle_with_nan(i),:),'linear');
     end
