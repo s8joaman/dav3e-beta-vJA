@@ -25,8 +25,8 @@ sensors = {
    % 'BME680_569710616_channel_1' ...
    % 'ZMOD4410_77241862418580_channel_1' ...
    % 'ZMOD4410_77241862398351_channel_0' ...
-   'SGP30_all_channel_0' ...
-   % 'SGP30_all_channel_1' ...
+    'SGP30_all_channel_0' ...
+    'SGP30_all_channel_1' ...
     };
 
 %% Alle Gruppen die berechnet werden sollen
@@ -43,14 +43,14 @@ groups = {...
 
 %% Alle Rergessions-Methoden die berechnet werden sollen
 method = {
-    'RFESVR', ...
+    % 'RFESVR', ...
      'RFEplsr', ...
      'RFEleastsquares', ...
     };
 
 evalF={"sensor","gas","method",...
         "numFeatMinOneStd","nCompMinOneStd",...
-        "TrainingError",... 
+        "TrainingError", 'TestingError',... 
        "rank","Cluster","featCap",...
        "fullModelData", "POT"};
 
@@ -164,11 +164,12 @@ for s=1:length(sensors)
             evalF{nbtk,4} = eval.nFeatMinOneStd;
             evalF{nbtk,5} = eval.nCompMinOneStd;
             evalF{nbtk,6} = eval.err.training;
-            evalF{nbtk,7} = eval.rank;
-            evalF{nbtk,8} = eval.currentCluster;
-            evalF{nbtk,9} = eval.featCap;
-            evalF{nbtk,10} = eval.fullModelData;
-            evalF{nbtk,11} = eval.pred;
+            evalF{nbtk,7} = eval.err.testing;
+            evalF{nbtk,8} = eval.rank;
+            evalF{nbtk,9} = eval.currentCluster;
+            evalF{nbtk,10} = eval.featCap;
+            evalF{nbtk,11} = eval.fullModelData;
+            evalF{nbtk,12} = eval.pred;
 
             % file = fullfile(folder, [sensor,'-', groups{g},'-', method{m}, '.mat']);
             % save(file, 'model');
@@ -177,7 +178,7 @@ for s=1:length(sensors)
     file = fullfile(folder, [sensor,'-', 'eval' '.mat']);
     save(file, 'evalF');    
 end
-% clearvars -except dave errorMsg evalF
+clearvars ans data eval file folder g groups m method model models nbtk project s sel_sensors sensor sensors system
 
 %% funktion die die passenden Sensoren aktiv setzt
 function setSensors(project, system, sensors)
@@ -248,11 +249,18 @@ function setSensors(project, system, sensors)
                 setSensorActive(project,'20190320_131605_hs2', sensor) % 13
                 setSensorActive(project,'20190322_134659_hs2', sensor) % 14
             case 'calibration0'
-                setSensorActive(project,'calibration0', sensor) % SEQ0
-                setSensorActive(project,'calibration1', sensor) % SEQ0
-                setSensorActive(project,'field0', sensor) % SEQ0
-                setSensorActive(project,'field1', sensor) % SEQ0
-                setSensorActive(project,'field2', sensor) % SEQ0
+                 setSensorActive(project,'calibration0', sensor) % SEQ0
+                  setSensorActive(project,'calibration1', sensor) % SEQ0
+%                 setSensorActive(project,'field0', sensor) % SEQ0
+%                 setSensorActive(project,'field1', sensor) % SEQ0
+%                 setSensorActive(project,'field2', sensor) % SEQ0
+%                 setSensorActive(project,'field3', sensor) % SEQ0
+%              setSensorActive(project,'calibrationAfterField', sensor) % SEQ0
+%              setSensorActive(project,'calibrationLowConcentrations', sensor) % SEQ0
+%                setSensorActive(project,'calibrationHighConcentrations', sensor) % SEQ0
+                setSensorActive(project,'field4', sensor) % SEQ0
+                 setSensorActive(project,'field5', sensor) % SEQ0
+                 setSensorActive(project,'field6', sensor) % SEQ0
         end
     end
 end
@@ -350,14 +358,16 @@ function [modelStruct, eval] = computeModel(project, group, method, sensor, eval
     eval.nCompMinOneStd = evalR{sgmInd,5};
     
     eval.err.training = sqrt(mean((modelStruct.datas.trainingPrediction(modelStruct.datas.trainingSelection)-modelStruct.datas.target(modelStruct.datas.trainingSelection)).^2));
+    eval.err.testing = sqrt(mean((modelStruct.datas.testingPrediction(modelStruct.datas.testingSelection)-modelStruct.datas.target(modelStruct.datas.testingSelection)).^2));
     eval.fullModelData= modelStruct.datas;
     
     eval.pred.trainData = modelStruct.datas.target(modelStruct.datas.trainingSelection);
     eval.pred.trainPred = modelStruct.datas.trainingPrediction(modelStruct.datas.trainingSelection);
     eval.pred.testPred = modelStruct.datas.testingPrediction(modelStruct.datas.testingSelection);
+    eval.pred.testData = modelStruct.datas.target(modelStruct.datas.testingSelection);
     
-    eval.pred.trainOffset = project.currentModel.fullModelData.getSelectedCycleOffsets('training');
-    eval.pred.testOffset = project.currentModel.fullModelData.getSelectedCycleOffsets('testing');
+    eval.pred.trainOffset = modelStruct.datas.offsets(modelStruct.datas.trainingSelection);
+    eval.pred.testOffset = modelStruct.datas.offsets(modelStruct.datas.testingSelection);
 %      % save for evaluation 2: Elbow
 %     valErr = eval.err.validation(end,:);
 %     x = 1:1:(length(valErr));
